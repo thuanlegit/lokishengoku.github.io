@@ -1,1 +1,0 @@
-# lokishengoku.github.io
