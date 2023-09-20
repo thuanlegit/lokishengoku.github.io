@@ -5,14 +5,26 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
         margin: 0;
+      }
+
+      #iframeContainer {
+        width: 100%;
+        height: 600px; 
+        position: relative;
+        overflow: hidden;
+      }
+
+      iframe {
+        width: 100%;
+        border: none;
       }
 
       #formContainer {
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: #f0f0f0;
         height: 100vh;
       }
 
@@ -71,23 +83,52 @@
         return urlParams.get(name);
       }
 
-      const iframeSrcParam = getQueryParameter("iframeSrc");
+      const iframeSrc = getQueryParameter("iframeSrc");
 
-      if (iframeSrcParam) {
-        const iframe = document.createElement("iframe");
-        iframe.src = iframeSrcParam;
-        iframe.width = getQueryParameter("iframeWidth") || "800";
-        iframe.height = getQueryParameter("iframeHeight") || "600";
-        document.body.appendChild(iframe);
+      if (iframeSrc) {
+        const iframeWidth = getQueryParameter("iframeWidth") || "800";
+        const iframeHeight = getQueryParameter("iframeHeight") || "600";
+        const refreshInterval = parseInt(
+          getQueryParameter("refreshInterval") || 60000
+        );
 
-        const refreshIntervalParam =
-          getQueryParameter("refreshInterval") || 60000;
+        function createIframe() {
+          const iframe = document.createElement("iframe");
+          iframe.src = iframeSrc;
+          iframe.width = iframeWidth;
+          iframe.height = iframeHeight;
+          return iframe;
+        }
 
-        const refreshInterval = parseInt(refreshIntervalParam);
+        const iframe1 = createIframe();
+        iframe1.id = "iframe1";
+        const iframe2 = createIframe();
+        iframe2.id = "iframe2";
+        const iframeContainer = document.createElement("div");
+        iframeContainer.id = "iframeContainer";
+        iframeContainer.appendChild(iframe1);
+        iframeContainer.appendChild(iframe2);
 
-        setInterval(() => {
-          iframe.src = iframe.src;
-        }, refreshInterval);
+        document.body.appendChild(iframeContainer);
+
+        var currentIframe = 1;
+        const iframes = [document.getElementById("iframe1"), document.getElementById("iframe2")];
+
+        function refreshIframe() {
+          var nextIframe = (currentIframe + 1) % 2;
+
+          // Hide the current iframe and show the next one
+          iframes[currentIframe].style.display = "none";
+          iframes[nextIframe].style.display = "block";
+
+          // Reload the current iframe
+          iframes[currentIframe].src = iframes[currentIframe].src;
+
+          // Update the current iframe index
+          currentIframe = nextIframe;
+        }
+
+        setInterval(refreshIframe, refreshInterval);
       } else {
         const form = document.createElement("form");
         form.id = "configForm";
@@ -97,13 +138,13 @@
                 <input type="text" id="iframeSrc" name="iframeSrc" required><br><br>
                 
                 <label for="iframeWidth">Iframe Width:</label>
-                <input type="number" id="iframeWidth" name="iframeWidth" required placeholder="800"><br><br>
+                <input type="number" id="iframeWidth" name="iframeWidth" placeholder="800"><br><br>
 
                 <label for="iframeHeight">Iframe Height:</label>
-                <input type="number" id="iframeHeight" name="iframeHeight" required placeholder="600"><br><br>
+                <input type="number" id="iframeHeight" name="iframeHeight" placeholder="600"><br><br>
 
                 <label for="refreshInterval">Refresh Interval (milliseconds):</label>
-                <input type="number" id="refreshInterval" name="refreshInterval" required placeholder="60000"><br><br>
+                <input type="number" id="refreshInterval" name="refreshInterval" placeholder="60000"><br><br>
 
                 <input type="submit" value="Submit">
             `;
