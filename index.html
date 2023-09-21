@@ -185,7 +185,7 @@
             `;
 
         // Event listener for form submission
-        form.addEventListener("submit", function (event) {
+        form.addEventListener("submit", async function (event) {
           event.preventDefault(); // Prevent the form from actually submitting
 
           // Get the form values
@@ -206,6 +206,11 @@
           )}&iframeScale=${encodeURIComponent(
             iframeScale
           )}&refreshInterval=${encodeURIComponent(refreshInterval)}`;
+
+          const resultUrl = window.location.href + redirectUrl;
+          await navigator.clipboard.writeText(resultUrl);
+          alert('URL copied to clipboard: ' + resultUrl);
+          
           window.location.search = redirectUrl;
         });
 
