@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Dynamic Iframe</title>
+    <title>Refreshify</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -31,6 +31,44 @@
         text-align: center;
         color: #333;
         margin-bottom: 30px;
+        margin-left: 20px;
+      }
+
+      .tooltip {
+        position: relative;
+        display: inline-block;
+        font-size: 20px;
+      }
+
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 300px;
+        background-color: #434343;
+        color: #fff;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 400;
+        border-radius: 6px;
+        padding: 12px 8px;
+        position: absolute;
+        z-index: 1;
+        top: 150%;
+        left: 50%;
+        margin-left: -158px;
+      }
+
+      .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+      }
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
       }
 
       form {
@@ -43,7 +81,7 @@
 
       label {
         display: block;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         color: #333;
       }
 
@@ -51,7 +89,7 @@
       input[type="number"] {
         width: 424px;
         padding: 12px;
-        margin-bottom: 10px;
+        margin-bottom: 4px;
         border: 1px solid #ddd;
         border-radius: 4px;
         background-color: #f9f9f9;
@@ -67,7 +105,7 @@
         border-radius: 4px;
         cursor: pointer;
         font-size: 18px;
-        margin-top: 10px;
+        margin-top: 4px;
       }
 
       input[type="submit"]:hover {
@@ -165,7 +203,12 @@
         const form = document.createElement("form");
         form.id = "configForm";
         form.innerHTML = `
-                <h1>Configure Dynamic Iframe</h1>
+                <h1>Refreshify
+                  <div class="tooltip">ⓘ
+                    <span class="tooltiptext">Refreshify is your ultimate web content refreshing and embedding solution. With Refreshify, not only can you automatically refresh content from your chosen source websites, but you can also seamlessly embed this dynamic content into other platforms like ClickUp, enabling you to view real-time website content within your preferred applications. Whether you're managing project dashboards, monitoring live data, or simply enhancing your website's user experience, Refreshify empowers you to effortlessly sync and share dynamic content. Say goodbye to manual updates and hello to automated content synchronization and embedding with Refreshify.</span>
+                  </div>
+                </h1>
+
                 <label for="iframeSrc">Iframe Source URL:</label>
                 <input type="text" id="iframeSrc" name="iframeSrc" required><br><br>
                 
@@ -181,7 +224,7 @@
                 <label for="refreshInterval">Refresh Interval (milliseconds):</label>
                 <input type="number" id="refreshInterval" name="refreshInterval" placeholder="${defaultRefreshInterval}"><br><br>
 
-                <input type="submit" value="Submit">
+                <input type="submit" value="Launch">
             `;
 
         // Event listener for form submission
@@ -209,8 +252,8 @@
 
           const resultUrl = window.location.href + redirectUrl;
           await navigator.clipboard.writeText(resultUrl);
-          alert('URL copied to clipboard: ' + resultUrl);
-          
+          alert("URL copied to clipboard:\n\n" + resultUrl);
+
           window.location.search = redirectUrl;
         });
 
