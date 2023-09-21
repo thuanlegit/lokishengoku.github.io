@@ -77,6 +77,11 @@
   </head>
   <body>
     <script>
+      const defaultIframeWidth = 800;
+      const defaultIframeHeight = 600;
+      const defaultIframeScale = 1;
+      const defaultRefreshInterval = 60000;
+
       function getQueryParameter(name) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(name);
@@ -85,17 +90,34 @@
       const iframeSrc = getQueryParameter("iframeSrc");
 
       if (iframeSrc) {
-        const iframeWidth = getQueryParameter("iframeWidth") || "800";
-        const iframeHeight = getQueryParameter("iframeHeight") || "600";
-        const refreshInterval = parseInt(
-          getQueryParameter("refreshInterval") || 60000
-        );
+        const iframeWidth = parseFloat(getQueryParameter("iframeWidth"));
+        const iframeHeight = parseFloat(getQueryParameter("iframeHeight"));
+        const iframeScale = parseFloat(getQueryParameter("iframeScale"));
+        const refreshInterval = parseInt(getQueryParameter("refreshInterval"));
 
         function createIframe() {
           const iframe = document.createElement("iframe");
           iframe.src = iframeSrc;
-          iframe.width = iframeWidth;
-          iframe.height = iframeHeight;
+
+          if (!isNaN(iframeWidth) && iframeWidth > 0) {
+            iframe.width = iframeWidth;
+          } else {
+            iframe.width = defaultIframeWidth;
+          }
+
+          if (!isNaN(iframeHeight) && iframeHeight > 0) {
+            iframe.height = iframeHeight;
+          } else {
+            iframe.height = defaultIframeHeight;
+          }
+
+          if (!isNaN(iframeScale) && iframeScale > 0) {
+            iframe.style.transform = "scale(" + iframeScale + ")";
+          } else {
+            iframe.style.transform = "scale(" + defaultIframeScale + ")";
+          }
+          iframe.style.transformOrigin = "top left";
+
           return iframe;
         }
 
@@ -113,7 +135,10 @@
         document.body.appendChild(iframeContainer);
 
         var currentIframe = 1;
-        const iframes = [document.getElementById("iframe1"), document.getElementById("iframe2")];
+        const iframes = [
+          document.getElementById("iframe1"),
+          document.getElementById("iframe2"),
+        ];
 
         function refreshIframe() {
           var nextIframe = (currentIframe + 1) % 2;
@@ -123,13 +148,19 @@
           iframes[nextIframe].style.display = "block";
 
           // Reload the current iframe
-          iframes[currentIframe].contentWindow.location.replace(iframes[currentIframe].src);
+          iframes[currentIframe].contentWindow.location.replace(
+            iframes[currentIframe].src
+          );
 
           // Update the current iframe index
           currentIframe = nextIframe;
         }
 
-        setInterval(refreshIframe, refreshInterval);
+        if (!isNaN(refreshInterval) && refreshInterval > 0) {
+          setInterval(refreshIframe, refreshInterval);
+        } else {
+          setInterval(refreshIframe, defaultRefreshInterval);
+        }
       } else {
         const form = document.createElement("form");
         form.id = "configForm";
@@ -139,13 +170,16 @@
                 <input type="text" id="iframeSrc" name="iframeSrc" required><br><br>
                 
                 <label for="iframeWidth">Iframe Width:</label>
-                <input type="number" id="iframeWidth" name="iframeWidth" placeholder="800"><br><br>
+                <input type="number" id="iframeWidth" name="iframeWidth" placeholder="${defaultIframeWidth}"><br><br>
 
                 <label for="iframeHeight">Iframe Height:</label>
-                <input type="number" id="iframeHeight" name="iframeHeight" placeholder="600"><br><br>
+                <input type="number" id="iframeHeight" name="iframeHeight" placeholder="${defaultIframeHeight}"><br><br>
 
+                <label for="iframeScale">Iframe Scale:</label>
+                <input type="number" step="0.01" id="iframeScale" name="iframeScale" placeholder="${defaultIframeScale}"><br><br>
+               
                 <label for="refreshInterval">Refresh Interval (milliseconds):</label>
-                <input type="number" id="refreshInterval" name="refreshInterval" placeholder="60000"><br><br>
+                <input type="number" id="refreshInterval" name="refreshInterval" placeholder="${defaultRefreshInterval}"><br><br>
 
                 <input type="submit" value="Submit">
             `;
@@ -158,6 +192,7 @@
           const iframeSrc = document.getElementById("iframeSrc").value;
           const iframeWidth = document.getElementById("iframeWidth").value;
           const iframeHeight = document.getElementById("iframeHeight").value;
+          const iframeScale = document.getElementById("iframeScale").value;
           const refreshInterval =
             document.getElementById("refreshInterval").value;
 
@@ -168,6 +203,8 @@
             iframeWidth
           )}&iframeHeight=${encodeURIComponent(
             iframeHeight
+          )}&iframeScale=${encodeURIComponent(
+            iframeScale
           )}&refreshInterval=${encodeURIComponent(refreshInterval)}`;
           window.location.search = redirectUrl;
         });
